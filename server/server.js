@@ -1,30 +1,26 @@
-const mongoose = require('./db/mongoose.js');
-const todo = require('./models/todo.js');
-const user = require('./models/user.js');
+const mongoose = require('mongoose');
+const {todo} = require('./models/todo.js');
+const {user} = require('./models/user.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-/*
-var newTodo = new todo({
-    text: 'some text',
-    completed: false,
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost:27017/TodoApp');
+
+var app = express();
+
+app.use(bodyParser.json());
+
+app.post('/todos', (request, respond) => {
+    var newtodo = new todo(request.body);
+    newtodo.save().then((result) => {
+        respond.send(`Note Saved: ${result}`);
+        console.log(result);
+    }, (error) => {
+        respond.status(400 ).send(`Error Occured: ${error}`);
+    });
 });
 
-newTodo.save().then((document) => {
-    console.log(`Todo saved: ${document}`);
-}, (error) => {
-    console.log(`Error ocured: ${error}`);
+app.listen(3000, () => {
+    console.log('Server is up on port 3000');
 });
-
-var newuser = new user({
-    username: 'mittal0109',
-    email: 'mittal01091997@gmail.com'
-});
-
-newuser.save().then((document) => {
-    console.log(`User saved: ${document}`);
-}, (error) => {
-    console.log(`Error ocured: ${error}`);
-});
-*/
-
