@@ -11,16 +11,28 @@ var app = express();
 
 app.use(bodyParser.json());
 
-app.post('/todos', (request, respond) => {
+app.post('/todos', (request, response) => {
     var newtodo = new todo(request.body);
     newtodo.save().then((result) => {
-        respond.send(`Note Saved: ${result}`);
+        response.send(result);
         console.log(result);
     }, (error) => {
-        respond.status(400 ).send(`Error Occured: ${error}`);
+        response.status(400).send(`Error Occured: ${error}`);
+    });
+});
+
+app.get('/todos', (request, response) => {
+    todo.find().then((todos) => {
+        response.send({todos});
+    }, (error) => {
+        response.status(400).send(`Error Occured: ${error}`);
     });
 });
 
 app.listen(3000, () => {
     console.log('Server is up on port 3000');
 });
+
+module.exports = {app};
+
+// mongoose.disconnect();
