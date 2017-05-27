@@ -17,7 +17,7 @@ app.post('/todos', (request, response) => {
         response.send(result);
         console.log(result);
     }, (error) => {
-        response.status(400).send(`Error Occured: ${error}`);
+        response.status(400).send(error);
     });
 });
 
@@ -25,7 +25,7 @@ app.get('/todos', (request, response) => {
     todo.find().then((todos) => {
         response.send({todos});
     }, (error) => {
-        response.status(400).send(`Error Occured: ${error}`);
+        response.status(400).send(error);
     });
 });
 
