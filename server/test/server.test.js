@@ -29,9 +29,7 @@ describe('POST /todos', () => {
                     expect(todos.length).toBe(initialTodoCount+1);
                     expect(todos[initialTodoCount].text).toBe(text);
                     done();
-                }).catch((error) => {
-                    return done(error);
-                });
+                }).catch((error) => done(error));
             });
     });
 
@@ -46,9 +44,7 @@ describe('POST /todos', () => {
                 todo.find().then((todos) => {
                     expect(todos.length).toBe(initialTodoCount);
                     done();
-                }).catch((error) => {
-                    return done(error);
-                });
+                }).catch((error) => done(error));
             });
     });
 });
@@ -60,6 +56,33 @@ describe('GET /todos', () => {
             .expect(200)
             .expect((response) => {
                 expect(response.body.todos.length).toBe(initialTodoCount)
+            })
+            .end(done);
+    });
+});
+
+describe('GET /todos/:id', () => {
+    it('should return 404 for invalid ObjectID', (done) => {
+        request(app)
+            .get('/todos/wrongod')
+            .expect(404)
+            .end(done);
+    });
+
+    it('should return 404 for ObjectID not found', (done) => {
+        request(app)
+            .get('/todos/5923cb3cf53ee810fc649b12')
+            .expect(404)
+            .end(done);
+    });
+    
+    it('should return todo with 200 or valid ObjectID', (done) => {
+        request(app)
+            .get('/todos/5923cb3cf53ee810fc649b11')
+            .expect(200)
+            .expect((response) => {
+                expect(response.body._id).toBe('5923cb3cf53ee810fc649b11');
+                expect(response.body.text).toBe('some text');
             })
             .end(done);
     });
