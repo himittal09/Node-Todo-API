@@ -11,8 +11,9 @@ beforeEach((done) => {
         done();
     });
 });
-
+/******************************************************************************/
 describe('POST /todos', () => {
+
     it('should create a new todo', (done) => {
         var text = 'This is test text part 5';
         request(app)
@@ -48,8 +49,9 @@ describe('POST /todos', () => {
             });
     });
 });
-
+/******************************************************************************/
 describe('GET /todos', () => {
+
     it('should retrun all todos', (done) => {
         request(app)
             .get('/todos')
@@ -60,8 +62,9 @@ describe('GET /todos', () => {
             .end(done);
     });
 });
-
+/******************************************************************************/
 describe('GET /todos/:id', () => {
+
     it('should return 404 for invalid ObjectID', (done) => {
         request(app)
             .get('/todos/wrongod')
@@ -86,4 +89,16 @@ describe('GET /todos/:id', () => {
             })
             .end(done);
     });
+});
+/******************************************************************************/
+describe('DELETE /todos/:id', () => {
+    it('should return a 404 for invalid ObjectID', (done) => {});
+    it('should return a deleted todo', (done) => {});
+    it('should return a 404 for ObjectID not found', (done) => {});
+});
+/******************************************************************************/
+describe('PATCH /todos/:id', () => {
+    it('should return a 404 for invalid ObjectID', (done) => {});
+    it('should return a updated todo', (done) => {});
+    it('should return a 404 for ObjectID not found', (done) => {});
 });

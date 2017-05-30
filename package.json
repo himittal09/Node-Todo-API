@@ -5,24 +5,34 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/server.js",
-    "test": "mocha server/**/*.test.js",
+    "test": "export NODE_ENV = test || SET \"NODE_ENV = test\" && mocha server/**/*.test.js",
     "testWatch": "nodemon --exec 'npm test'"
   },
   "engines": {
-    "node": "7.9.0"  
+    "node": "7.9.0"
   },
   "author": "Himanshu",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "lodash": "^4.17.4",
     "mongodb": "^2.2.26",
-    "mongoose": "^4.10.1"
+    "mongoose": "^4.10.1",
+    "validator": "^7.0.0"
   },
   "devDependencies": {
     "expect": "^1.20.2",
     "mocha": "^3.4.1",
     "nodemon": "^1.11.0",
     "supertest": "^3.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mittal01091997/Node-Todo-API.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mittal01091997/Node-Todo-API/issues"
+  },
+  "homepage": "https://github.com/mittal01091997/Node-Todo-API#readme"
 }
