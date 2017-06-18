@@ -1,29 +1,26 @@
 require('./config/config');
-const mongoose = require('mongoose');
+const {mongoose} = require('./db/mongoose');
 const {ObjectID} = require('mongodb');
-const {todo} = require('./models/todo.js');
-const {user} = require('./models/user.js');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
 const port = process.env.PORT;
-
-mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI);
 
 var app = express();
 
 app.use(bodyParser.json());
 
 app.post('/todos', (request, response) => {
-    var newtodo = new todo({text: request.body.text});
-    newtodo.save().then((result) => {
+    var todo = new Todo({text: request.body.text});
+    todo.save().then((result) => {
         response.send(result);
     }, (error) => response.status(400).send(error));
 });
 
 app.get('/todos', (request, response) => {
-    todo.find().then((todos) => {
+    Todo.find().then((todos) => {
         response.send({todos});
     }, (error) => response.status(400).send(error));
 });
@@ -32,7 +29,7 @@ app.get('/todos/:id', (request, response) => {
     var id = request.params.id;
     if (!ObjectID.isValid(id))
         return response.status(404).send();
-    todo.findById(id).then((result) => {
+    Todo.findById(id).then((result) => {
         if (!result)
             return response.status(404).send();
         response.status(200).send(result);
@@ -43,7 +40,7 @@ app.delete('/todos/:id', (request, response) => {
     var id = request.params.id;
     if (!ObjectID.isValid(id))
         return response.status(404).send();
-    todo.findByIdAndRemove(id).then((result) => {
+    Todo.findByIdAndRemove(id).then((result) => {
         if (!result)
             return response.status(404).send();
         response.status(200).send(result);
@@ -64,7 +61,7 @@ app.patch('/todos/:id', (request, response) => {
         body.completedAt = null;
     }
 
-    todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
         if (!todo)
             return response.status(404).send();
         response.status(200).send({todo});
@@ -72,10 +69,13 @@ app.patch('/todos/:id', (request, response) => {
 });
 
 app.post('/users', (request, response) => {
-    var newuser = new user(_.pick(request.body, ['email', 'password']));
-    newuser.save().then((result) => {
-        response.send(result);
-    }, (error) => response.status(400).send(error));
+    var body = _.pick(request.body, ['email', 'password']);
+    var user = new User(body);
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        response.header('x-auth', token).send(user);
+    }).catch((error) => response.status(400).send(error));
 });
 
 app.listen(port, () => {
