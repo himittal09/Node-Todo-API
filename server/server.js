@@ -7,6 +7,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
 const port = process.env.PORT;
+const {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 
@@ -76,6 +77,10 @@ app.post('/users', (request, response) => {
     }).then((token) => {
         response.header('x-auth', token).send(user);
     }).catch((error) => response.status(400).send(error));
+});
+
+app.get('/users/me', authenticate, (request, response) => {
+    response.send(request.user);
 });
 
 app.listen(port, () => {
