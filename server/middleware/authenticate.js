@@ -9,7 +9,7 @@ var authenticate = (request, response, next) => {
         request.user = user;
         request.token = token;
         next();
-    }).catch((error) => response.status(401).send(error));
+    }).catch((error) => response.status(401).send());
 };
 
 module.exports = {authenticate};

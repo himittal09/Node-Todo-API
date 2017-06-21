@@ -2,6 +2,7 @@ const expect = require('expect');
 const request = require('supertest');
 const {app} = require('../server.js');
 const {Todo} = require('../models/todo');
+const {User} = require('../models/user');
 const {ObjectID} = require('mongodb');
 const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
@@ -84,7 +85,7 @@ describe('GET /todos/:id', () => {
             .get(`/todos/${todos[0]._id.toHexString()}`)
             .expect(200)
             .expect((response) => {
-                expect(response.body._id).toBe(todos[0]._id.toHexString());  // <--------------------------------------------
+                expect(response.body._id).toBe(todos[0]._id.toHexString());
                 expect(response.body.text).toBe(todos[0].text);
             })
             .end(done);
@@ -194,11 +195,84 @@ describe('PATCH /todos/:id', () => {
             .end(done);        
     });
 });
+/******************************************************************************/
+describe('POST /users', () => {
+    it('should create a user', (done) => {
+        var email = 'himanshu@example.com';
+        var password = 'somepass123';
+        request(app)
+            .post('/users')
+            .send({
+                email,
+                password
+            })
+            .expect(200)
+            .expect((response) => {
+                expect(response.body.email).toBe(email);
+                expect(response.headers['x-auth']).toExist();
+                expect(response.body._id).toExist();
+            })
+            .end((error) => {
+                if (error)
+                    return done(error);
+                
+                User.findOne({email}).then((user) => {
+                    expect(user).toExist();
+                    expect(user.password).toNotBe(password);
+                    done();
+                }).catch((error) => done(error));
+            });
+    });
 
-describe('POST /users', () => {});
+    it('should return validation errors if request is invalid', (done) => {
+        var email = 'someinvalidemail';
+        var password = 'someinvalidpass';
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(400)
+            .expect((response) => {
+                expect(response.body).toExist();
+            })
+            .end(done);
+            
+    });
 
+    it('should not create a user if email in use', (done) => {
+        var email = 'userone@example.com';
+        var password = 'someinvalidpass';
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(400)
+            .expect((response) => {
+                expect(response.body).toExist();
+            })
+            .end(done);
+    });
+});
+/******************************************************************************/
 describe('GET /users/me', () => {
-    it('should take a valid jwt token return a user', (done) => {});
-    it('should return 401 for a invalid token', (done) => {});
-    it('should return 401 for a valid jwt token for user not present', (done) => {});
+    it('should return a user if authenticated', (done) => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            .expect((response) => {
+                expect(response.body._id).toBe(users[0]._id.toHexString());
+                expect(response.body.email).toBe(users[0].email);
+            })
+            .end(done);
+    });
+
+    it('should return 401 for not authenticated', (done) => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', 'some.invaild.token')
+            .expect(401)
+            .expect((response) => {
+                expect(response.body).toEqual({});
+            })
+            .end(done);
+    });
 });
