@@ -18,13 +18,13 @@ app.post('/todos', (request, response) => {
     todo.save().then((result) => {
         response.send(result);
     }, (error) => response.status(400).send(error));
-});
+}); // test written
 
 app.get('/todos', (request, response) => {
     Todo.find().then((todos) => {
         response.send({todos});
     }, (error) => response.status(400).send(error));
-});
+}); // test written
 
 app.get('/todos/:id', (request, response) => {
     var id = request.params.id;
@@ -35,7 +35,7 @@ app.get('/todos/:id', (request, response) => {
             return response.status(404).send();
         response.status(200).send(result);
     }).catch((error) => response.status(400).send('Todo Not Found'));
-});
+}); // test written
 
 app.delete('/todos/:id', (request, response) => {
     var id = request.params.id;
@@ -46,7 +46,7 @@ app.delete('/todos/:id', (request, response) => {
             return response.status(404).send();
         response.status(200).send(result);
     }).catch((error) => response.status(400).send('Todo Not Found'));
-});
+}); // test written
 
 app.patch('/todos/:id', (request, response) => {
     var id = request.params.id;
@@ -67,7 +67,7 @@ app.patch('/todos/:id', (request, response) => {
             return response.status(404).send();
         response.status(200).send({todo});
     }).catch((error) => response.status(400).send());
-});
+}); // test written
 
 app.post('/users', (request, response) => {
     var body = _.pick(request.body, ['email', 'password']);

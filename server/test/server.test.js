@@ -3,25 +3,10 @@ const request = require('supertest');
 const {app} = require('../server.js');
 const {Todo} = require('../models/todo');
 const {ObjectID} = require('mongodb');
+const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
-const todos = [
-    {
-        _id: new ObjectID(),
-        text: 'First test todo'
-    }, 
-    {
-        _id: new ObjectID(),
-        text: 'Second test todo',
-        completed: true,
-        completedAt: 333
-    }
-];
-
-beforeEach((done) => {
-    Todo.remove({}).then(() => {
-        return Todo.insertMany(todos);
-    }).then(() => done());
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 /******************************************************************************/
 describe('POST /todos', () => {
@@ -115,14 +100,12 @@ describe('DELETE /todos/:id', () => {
     });
 
     it('should return a deleted todo', (done) => {
-        // console.log(todos[1]);
         var hexId = todos[1]._id.toHexString();
 
         request(app)
             .delete(`/todos/${hexId}`)
             .expect(200)
             .expect((response) => {
-                // console.log(response.body)
                 expect(response.body._id).toBe(hexId);
             })
             .end((error, response) => {
@@ -210,4 +193,12 @@ describe('PATCH /todos/:id', () => {
             .expect(404)
             .end(done);        
     });
+});
+
+describe('POST /users', () => {});
+
+describe('GET /users/me', () => {
+    it('should take a valid jwt token return a user', (done) => {});
+    it('should return 401 for a invalid token', (done) => {});
+    it('should return 401 for a valid jwt token for user not present', (done) => {});
 });
