@@ -4,6 +4,7 @@ const {ObjectID} = require('mongodb');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const express = require('express');
+// const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
 const port = process.env.PORT;
@@ -77,11 +78,22 @@ app.post('/users', (request, response) => {
     }).then((token) => {
         response.header('x-auth', token).send(user);
     }).catch((error) => response.status(400).send(error));
-});
+}); // test written
 
 app.get('/users/me', authenticate, (request, response) => {
     response.send(request.user);
-});
+}); // test written
+
+app.post('/users/login', (request, response) => {
+    body = _.pick(request.body, ['email', 'password']);
+
+    User.findByCredentials(body).then((user) => {
+        // response.status(200).send(user);
+        return user.generateAuthToken().then((token) => {
+            response.header('x-auth', token).send(user);
+        });
+    }).catch((error) => response.status(400).send());
+})
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
