@@ -4,7 +4,6 @@ const {ObjectID} = require('mongodb');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const express = require('express');
-// const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
 const port = process.env.PORT;
@@ -93,6 +92,12 @@ app.post('/users/login', (request, response) => {
         });
     }).catch((error) => response.status(400).send());
 }); // test written
+
+app.delete('/users/me/token', authenticate, (request, response) => {
+    request.user.removeToken(request.token).then(() => {
+        response.status(200).send();
+    }).catch(() => response.status(200).send());
+});
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
