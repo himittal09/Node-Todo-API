@@ -88,12 +88,11 @@ app.post('/users/login', (request, response) => {
     body = _.pick(request.body, ['email', 'password']);
 
     User.findByCredentials(body).then((user) => {
-        // response.status(200).send(user);
         return user.generateAuthToken().then((token) => {
             response.header('x-auth', token).send(user);
         });
     }).catch((error) => response.status(400).send());
-})
+}); // test written
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
